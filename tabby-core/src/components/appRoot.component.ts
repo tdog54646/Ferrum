@@ -234,6 +234,10 @@ export class AppRootComponent {
     }
 
     async openConnectionSelector (): Promise<void> {
+        if (this.profileTree) {
+            await this.profileTree.createNewSSHConnection()
+            return
+        }
         await this.leftToolbarButtons?.[0]?.run?.()
     }
 

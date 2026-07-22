@@ -110,6 +110,7 @@ export class ProfileTreeComponent extends BaseComponent {
 
         await this.profilesService.writeProfile(result)
         await this.config.save()
+        await this.loadTreeItems()
     }
 
     private async editProfileGroup (group: PartialProfileGroup<CollapsableProfileGroup>): Promise<void> {
@@ -168,18 +169,28 @@ export class ProfileTreeComponent extends BaseComponent {
 
     async profileContextMenu (profile: PartialProfile<Profile>, event: MouseEvent): Promise<void> {
         event.preventDefault()
+        this.selectedProfile = profile
 
         this.platform.popupContextMenu([
             {
                 type: 'normal',
-                label: this.translate.instant('Run'),
-                click: () => this.launchProfile(profile),
+                label: this.translate.instant('New session'),
+                click: () => this.openNewSession(profile),
+            },
+            {
+                type: 'separator',
             },
             {
                 type: 'normal',
                 label: this.translate.instant('Edit profile'),
                 click: () => this.editProfile(profile),
-                enabled: !(profile.isBuiltin ?? profile.isTemplate),
+                enabled: this.canManageProfile(profile),
+            },
+            {
+                type: 'normal',
+                label: this.translate.instant('Delete profile'),
+                click: () => this.deleteProfile(profile),
+                enabled: this.canManageProfile(profile),
             },
         ])
     }
@@ -240,6 +251,52 @@ export class ProfileTreeComponent extends BaseComponent {
         return true
     }
 
+    get canManageSelectedProfile (): boolean {
+        return Boolean(this.selectedProfile && this.canManageProfile(this.selectedProfile))
+    }
+
+    async editSelectedProfile (): Promise<void> {
+        if (!this.selectedProfile || !this.canManageSelectedProfile) {
+            return
+        }
+        await this.editProfile(this.selectedProfile)
+    }
+
+    async deleteSelectedProfile (): Promise<void> {
+        const profile = this.selectedProfile
+        if (!profile || !this.canManageSelectedProfile) {
+            return
+        }
+        await this.deleteProfile(profile)
+    }
+
+    private canManageProfile (profile: PartialProfile<Profile>): boolean {
+        return !profile.isBuiltin && !profile.isTemplate
+    }
+
+    private async deleteProfile (profile: PartialProfile<Profile>): Promise<void> {
+        if (!this.canManageProfile(profile)) {
+            return
+        }
+        const result = await this.platform.showMessageBox({
+            type: 'warning',
+            message: this.translate.instant('Delete "{name}"?', profile),
+            buttons: [
+                this.translate.instant('Delete'),
+                this.translate.instant('Keep'),
+            ],
+            defaultId: 1,
+            cancelId: 1,
+        })
+        if (result.response !== 0) {
+            return
+        }
+        await this.profilesService.deleteProfile(profile)
+        await this.config.save()
+        this.selectedProfile = null
+        await this.loadTreeItems()
+    }
+
     isSelectedProfile (profile: PartialProfile<Profile>): boolean {
         return Boolean(profile.id && profile.id === this.selectedProfile?.id)
     }
@@ -254,6 +311,45 @@ export class ProfileTreeComponent extends BaseComponent {
 
     async refreshProfiles (): Promise<void> {
         await this.loadTreeItems()
+    }
+
+    async createNewSSHConnection (): Promise<void> {
+        const template = (await this.profilesService.getProfiles())
+            .find(profile => profile.type === 'ssh' && profile.isTemplate)
+        if (!template) {
+            throw new Error('SSH profile template is unavailable')
+        }
+
+        const profile: PartialProfile<Profile> = deepClone(template)
+        delete profile.id
+        profile.name = ''
+        profile.isBuiltin = false
+        profile.isTemplate = false
+
+        const { EditProfileModalComponent } = window['nodeRequire']('tabby-settings')
+        const modal = this.ngbModal.open(EditProfileModalComponent, { size: 'lg' })
+        const provider = this.profilesService.providerForProfile(profile)
+        if (!provider) {
+            throw new Error('SSH profile provider is unavailable')
+        }
+
+        modal.componentInstance.partialProfile = profile
+        modal.componentInstance.profileProvider = provider
+        const result: PartialProfile<Profile>|null = await modal.result.catch(() => null)
+        if (!result) {
+            return
+        }
+
+        result.type = provider.id
+        if (!result.name) {
+            const configProxy = this.profilesService.getConfigProxyForProfile(result)
+            result.name = provider.getSuggestedName(configProxy) ?? this.translate.instant('SSH connection')
+        }
+
+        await this.profilesService.newProfile(result)
+        await this.config.save()
+        await this.loadTreeItems()
+        this.selectedProfile = result.id ? this.findProfile(result.id) ?? result : result
     }
 
     private tabContainsProfile (tab: any, profileID?: string): boolean {
@@ -318,6 +414,11 @@ export class ProfileTreeComponent extends BaseComponent {
         } catch (error) {
             console.error('Error occurred during search:', error)
         }
+    }
+
+    async clearFilter (): Promise<void> {
+        this.filter = ''
+        await this.onFilterChange()
     }
 
     ////// RESIZING //////

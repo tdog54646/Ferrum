@@ -1,19 +1,32 @@
 .server-sidebar.h-100.d-flex.flex-column
     .server-sidebar-header
-        span.server-sidebar-title 连接
+        span.server-sidebar-title 服务器
         .server-sidebar-actions
-            button(type='button', [ngbTooltip]='"Import"|translate')
-                i.fas.fa-download
-            button(type='button', [ngbTooltip]='"Export"|translate')
-                i.fas.fa-upload
-            button(type='button', [ngbTooltip]='"Collapse all"|translate')
-                i.fas.fa-angles-up
-            button(type='button', [ngbTooltip]='"New group"|translate')
-                i.far.fa-folder-open
+            button(type='button', (click)='createNewSSHConnection()', [ngbTooltip]='"New connection"|translate')
+                i.fas.fa-plus
+            button(
+                type='button',
+                (click)='openSessionForSelectedProfile()',
+                [disabled]='!selectedProfile',
+                [ngbTooltip]='"New session"|translate'
+            )
+                i.fas.fa-terminal
+            button(
+                type='button',
+                (click)='editSelectedProfile()',
+                [disabled]='!canManageSelectedProfile',
+                [ngbTooltip]='"Edit profile"|translate'
+            )
+                i.fas.fa-pen
+            button.danger(
+                type='button',
+                (click)='deleteSelectedProfile()',
+                [disabled]='!canManageSelectedProfile',
+                [ngbTooltip]='"Delete profile"|translate'
+            )
+                i.far.fa-trash-can
             button(type='button', (click)='refreshProfiles()', [ngbTooltip]='"Refresh"|translate')
                 i.fas.fa-rotate
-            button(type='button', [ngbTooltip]='"Collapse sidebar"|translate')
-                i.fas.fa-angles-left
     .server-search-row
         .server-search
             i.fas.fa-magnifying-glass
@@ -23,12 +36,13 @@
                 placeholder='搜索...',
                 (ngModelChange)='onFilterChange()'
             )
-        button.server-search-tool(type='button', [ngbTooltip]='"Locate"|translate')
-            i.fas.fa-crosshairs
-        button.server-search-tool(type='button', [ngbTooltip]='"Sort"|translate')
-            i.fas.fa-list-ol
-        button.server-search-tool(type='button', [ngbTooltip]='"Filter"|translate')
-            i.fas.fa-filter
+            button.server-search-clear(
+                *ngIf='filter',
+                type='button',
+                (click)='clearFilter()',
+                [ngbTooltip]='"Clear search"|translate'
+            )
+                i.fas.fa-xmark
 
     .profile-tree.h-100
         .d-flex.flex-column.profile-tree-container
@@ -40,7 +54,6 @@
                 (contextmenu)='profileContextMenu(profile, $event)',
                 href='#'
             )
-                i.server-chevron.fas.fa-chevron-right
                 i.server-icon.fas.fa-server
                 span.profile-name {{ profile.name }}
                 span.session-status(*ngIf='hasOpenSession(profile)')
