@@ -22,31 +22,8 @@ title-bar(
     )
         i.far.fa-file
         span 新建会话
-    button.dbx-toolbar-action(type='button')
-        i.fas.fa-arrow-right-arrow-left
-        span 数据传输
-    button.dbx-toolbar-action(type='button')
-        i.fas.fa-cube
-        span 终端管理
-    button.dbx-toolbar-action(type='button')
-        span 更多
-        i.fas.fa-chevron-down.toolbar-chevron
     .dbx-toolbar-space
     .dbx-toolbar-icons
-        button.dbx-icon-button(type='button', [ngbTooltip]='"Updates"|translate')
-            i.fas.fa-cloud-arrow-down
-        button.dbx-icon-button(type='button', [ngbTooltip]='"Saved sessions"|translate')
-            i.far.fa-bookmark
-        button.dbx-icon-button(type='button', [ngbTooltip]='"File browser"|translate')
-            i.fas.fa-folder-tree
-        button.dbx-icon-button(type='button', [ngbTooltip]='"History"|translate')
-            i.fas.fa-clock-rotate-left
-        button.dbx-icon-button(type='button', [ngbTooltip]='"Toolbox"|translate')
-            i.fas.fa-toolbox
-        button.dbx-icon-button(type='button', [ngbTooltip]='"Theme"|translate')
-            i.far.fa-sun
-        button.dbx-icon-button(type='button', [ngbTooltip]='"GitHub"')
-            i.fab.fa-github
         button.dbx-icon-button(type='button', (click)='openSettings()', [ngbTooltip]='"Settings"|translate')
             i.fas.fa-gear
     window-controls(
@@ -99,38 +76,33 @@ title-bar(
                 [class.drag]='config.store.appearance.frame == "thin" \
                 && ((config.store.appearance.tabsLocation !== "left" && config.store.appearance.tabsLocation !== "right") || hostApp.platform !== Platform.macOS)'
             )
-        .session-toolbar(*ngIf='app.tabs.length > 0')
+        .session-toolbar(*ngIf='activeSessionHasTerminalTools')
             .session-toolbar-left
                 button.session-tool.primary(type='button', (click)='restartActiveSession()', [ngbTooltip]='"Reconnect"|translate')
-                    i.fas.fa-play
-                button.session-tool(type='button', [ngbTooltip]='"Split terminal"|translate')
-                    i.fas.fa-code-branch
-                button.session-tool(type='button', [ngbTooltip]='"Command history"|translate')
-                    span Tx
-                button.session-tool(type='button', [ngbTooltip]='"Clear terminal"|translate')
-                    i.fas.fa-align-left
-                button.session-tool(type='button', [ngbTooltip]='"Font"|translate')
-                    span A
-                button.session-tool(type='button', [ngbTooltip]='"Save output"|translate')
-                    i.far.fa-floppy-disk
+                    i.fas.fa-rotate-right
+                button.session-tool(type='button', (click)='splitActiveSession()', [ngbTooltip]='"Split terminal"|translate')
+                    i.fas.fa-table-columns
+                button.session-tool(
+                    *ngIf='activeSessionHasMultiplePanes',
+                    type='button',
+                    (click)='closeActivePane()',
+                    [ngbTooltip]='"Close pane"|translate'
+                )
+                    i.far.fa-rectangle-xmark
+                button.session-tool(type='button', (click)='copyActiveSelection()', [ngbTooltip]='"Copy"|translate')
+                    i.far.fa-copy
+                button.session-tool(type='button', (click)='pasteIntoActiveTerminal()', [ngbTooltip]='"Paste"|translate')
+                    i.far.fa-clipboard
+                button.session-tool(type='button', (click)='clearActiveTerminal()', [ngbTooltip]='"Clear terminal"|translate')
+                    i.fas.fa-eraser
+                button.session-tool(type='button', (click)='searchActiveTerminal()', [ngbTooltip]='"Search"|translate')
+                    i.fas.fa-magnifying-glass
                 button.session-tool(type='button', (click)='openActiveSFTP()', [ngbTooltip]='"SFTP"|translate')
                     i.far.fa-folder-open
-                button.session-tool(type='button', [ngbTooltip]='"Download"|translate')
-                    i.fas.fa-download
-                button.session-tool(type='button', [ngbTooltip]='"Upload"|translate')
-                    i.fas.fa-file-export
-            .session-toolbar-space
-            .active-server-context
-                i.fas.fa-server
-                strong {{activeServerName}}
-                i.fas.fa-chevron-down.context-chevron
-            .active-server-context.secondary(*ngIf='activeServerDescription')
-                i.fas.fa-terminal
-                span {{activeServerDescription}}
-                i.fas.fa-chevron-down.context-chevron
-            button.session-close(type='button', (click)='closeActiveSession()', [ngbTooltip]='"Close session"|translate')
-                i.fas.fa-xmark
-            span.session-default 设置为默认
+                button.session-tool(type='button', (click)='zoomOutActiveTerminal()', [ngbTooltip]='"Zoom out"|translate')
+                    i.fas.fa-magnifying-glass-minus
+                button.session-tool(type='button', (click)='zoomInActiveTerminal()', [ngbTooltip]='"Zoom in"|translate')
+                    i.fas.fa-magnifying-glass-plus
         .content
             start-page.content-tab.content-tab-active(*ngIf='ready && app.tabs.length == 0')
 

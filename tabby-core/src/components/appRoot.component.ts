@@ -248,34 +248,87 @@ export class AppRootComponent {
         await this.openConnectionSelector()
     }
 
-    get activeServerName (): string {
-        return this.activeLeafTab()?.profile?.name ?? this.app.activeTab?.customTitle ?? this.app.activeTab?.title ?? '终端会话'
-    }
-
-    get activeServerDescription (): string {
-        const profile = this.activeLeafTab()?.profile
-        if (!profile) {
-            return ''
-        }
-        const user = profile.options?.user
-        const host = profile.options?.host
-        const port = profile.options?.port
-        if (!host) {
-            return ''
-        }
-        return `${user ? `${user}@` : ''}${host}${port && port !== 22 ? `:${port}` : ''}`
-    }
-
     restartActiveSession (): void {
         if (this.app.activeTab) {
             this.app.restartTab(this.app.activeTab)
         }
     }
 
-    closeActiveSession (): void {
-        if (this.app.activeTab) {
-            this.app.closeTab(this.app.activeTab, true)
+    async splitActiveSession (): Promise<void> {
+        const container = this.app.activeTab
+        const leaf = this.activeLeafTab()
+        if (container instanceof SplitTabComponent && leaf) {
+            await container.splitTab(leaf, 'r')
         }
+    }
+
+    get activeSessionHasMultiplePanes (): boolean {
+        const container = this.app.activeTab
+        return container instanceof SplitTabComponent && container.getAllTabs().length > 1
+    }
+
+    get activeSessionHasTerminalTools (): boolean {
+        const leaf = this.activeLeafTab()
+        return !!leaf && ('frontend' in leaf || typeof leaf.paste === 'function')
+    }
+
+    async closeActivePane (): Promise<void> {
+        const container = this.app.activeTab
+        const leaf = this.activeLeafTab()
+        if (!(container instanceof SplitTabComponent) || !leaf || container.getAllTabs().length < 2) {
+            return
+        }
+        if (leaf.canClose && !await leaf.canClose()) {
+            return
+        }
+        await leaf.destroy()
+    }
+
+    copyActiveSelection (): void {
+        const leaf = this.activeLeafTab()
+        const frontend = leaf?.frontend
+        if (frontend?.getSelection?.()) {
+            frontend.copySelection()
+            frontend.clearSelection()
+        }
+        leaf?.focus?.()
+    }
+
+    async pasteIntoActiveTerminal (): Promise<void> {
+        const leaf = this.activeLeafTab()
+        await leaf?.paste?.()
+        leaf?.focus?.()
+    }
+
+    clearActiveTerminal (): void {
+        const leaf = this.activeLeafTab()
+        leaf?.frontend?.clear?.()
+        leaf?.focus?.()
+    }
+
+    searchActiveTerminal (): void {
+        const leaf = this.activeLeafTab()
+        if (!leaf) {
+            return
+        }
+        leaf.showSearchPanel = true
+        setImmediate(() => {
+            const input = document.querySelector<HTMLInputElement>('.content-tab-active .search-input')
+            input?.focus()
+            input?.select()
+        })
+    }
+
+    zoomOutActiveTerminal (): void {
+        const leaf = this.activeLeafTab()
+        leaf?.zoomOut?.()
+        leaf?.focus?.()
+    }
+
+    zoomInActiveTerminal (): void {
+        const leaf = this.activeLeafTab()
+        leaf?.zoomIn?.()
+        leaf?.focus?.()
     }
 
     async openActiveSFTP (): Promise<void> {
