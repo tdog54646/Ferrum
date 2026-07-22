@@ -1,32 +1,135 @@
 :host {
-    display: flex;
+    --dbx-bg: #ffffff;
+    --dbx-fg: #0a0a0a;
+    --dbx-muted: #f5f5f5;
+    --dbx-muted-soft: #fafafa;
+    --dbx-muted-fg: #737373;
+    --dbx-border: #e5e5e5;
+    --dbx-selected: #e7f0ff;
+    --dbx-blue: #2563eb;
+    --tabs-height: 38px;
+    --side-tab-width: 200px;
+
     width: 100vw;
     height: 100vh;
+    display: flex;
     flex-direction: column;
     overflow: hidden;
+    color: var(--dbx-fg);
+    background: var(--dbx-bg);
     user-select: none;
     -webkit-user-drag: none;
-    will-change: transform;
     cursor: default;
-    animation: 0.5s ease-out fadeIn;
-    transition: 0.25s background;
-
-    --tabs-height: calc(38px * var(--spaciness));
-    --side-tab-width: calc(200px * var(--spaciness));
+    font-family: "Geist Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+    font-size: 12px;
+    -webkit-font-smoothing: antialiased;
 }
 
-$tab-border-radius: 4px;
-
 .wrap {
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  flex-direction: row;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+}
+
+.dbx-toolbar {
+    flex: 0 0 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 8px;
+    color: var(--dbx-fg);
+    background: var(--dbx-muted-soft);
+    border-bottom: 1px solid var(--dbx-border);
+    -webkit-app-region: drag;
+
+    .mac-traffic-light-space {
+        flex: 0 0 72px;
+        align-self: stretch;
+    }
+
+    button {
+        -webkit-app-region: no-drag;
+    }
+
+    .dbx-toolbar-action {
+        height: 32px;
+        padding: 0 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--dbx-fg);
+        background: transparent;
+        border: 0;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+
+        &:hover {
+            background: var(--dbx-muted);
+        }
+
+        i {
+            width: 15px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .toolbar-chevron {
+            width: 9px;
+            margin-left: 1px;
+            font-size: 9px;
+            color: var(--dbx-muted-fg);
+        }
+    }
+
+    .primary-action {
+        font-weight: 700;
+    }
+
+    .dbx-toolbar-space {
+        flex: 1;
+        min-width: 12px;
+    }
+
+    .dbx-toolbar-icons {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .dbx-icon-button {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dbx-fg);
+        background: transparent;
+        border: 0;
+        border-radius: 6px;
+        font-size: 15px;
+
+        &:hover {
+            background: var(--dbx-muted);
+        }
+    }
+}
+
+.window {
+    flex: 1 1 0;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    overflow: hidden;
+    background: var(--dbx-bg);
 }
 
 .content {
     width: 100%;
     flex: 1 1 0;
+    min-width: 0;
     min-height: 0;
     display: flex;
     flex-direction: column-reverse;
@@ -44,146 +147,254 @@ $tab-border-radius: 4px;
     }
 }
 
-.content.tabs-on-left > .tab-bar, .content.tabs-on-right > .tab-bar {
-    height: 100%;
+.content.tabs-on-left > .tab-bar,
+.content.tabs-on-right > .tab-bar {
     width: var(--side-tab-width);
-    overflow-y: auto;
-    overflow-x: hidden;
+    height: 100%;
     flex-direction: column;
-    background: var(--theme-bg-more-2);
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: var(--dbx-muted);
 
     .tabs {
         width: var(--side-tab-width);
         flex: none;
         flex-direction: column;
+    }
 
-        tab-header {
-            flex: 0 0 var(--tabs-height);
-        }
+    ::ng-deep tab-header {
+        width: 100% !important;
+        flex: 0 0 var(--tabs-height);
     }
 
     .btn-space {
         flex: auto;
     }
-
-    &>.inset {
-        opacity: 0;
-        width: 100%;
-    }
-
-    ::ng-deep tab-header {
-        width: 100% !important;
-    }
 }
 
-.content.tabs-on-left > .tab-bar.tab-bar-no-controls-overlay, .content.tabs-titlebar-enabled {
-    .tabs {
-        padding-top: 0 !important;
-    }
-}
-
-.content.tabs-on-right > .tab-bar {
-    .tabs {
-        // Account for WCO on Windows.
-        padding-top: 36px;
-    }
+.content.tabs-on-right > .tab-bar .tabs {
+    padding-top: 36px;
 }
 
 .tab-bar {
-    flex: none;
+    flex: 0 0 var(--tabs-height);
     height: var(--tabs-height);
-    display: flex;
     width: 100%;
+    display: flex;
+    color: var(--dbx-fg);
+    background: var(--dbx-muted);
+    border-bottom: 1px solid var(--dbx-border);
 
-    .btn-tab-bar {
-        line-height: calc(var(--tabs-height) + 2px);
-        height: var(--tabs-height);
-        cursor: pointer;
-
+    > .tabs {
+        min-width: 0;
         display: flex;
-        align-items: center;
-        padding: 0 12px;
-        flex: 0 0 auto;
-        border-bottom: 2px solid transparent;
-        transition: 0.125s all ease-out;
-        font-size: 12px;
+        flex: 0 1 auto;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
 
-        text-transform: uppercase;
-        font-weight: bold;
-        color: #aaa;
-        border: none;
-        border-radius: 0;
-
-        align-items: center;
-
-        &.dropdown-toggle::after {
+        &::-webkit-scrollbar {
             display: none;
         }
     }
 
-    &>.tabs {
-        flex: 0 1 auto;
-        display: flex;
-        min-width: 0;
+    ::ng-deep tab-header {
+        width: 190px !important;
+        min-width: 190px !important;
+        max-width: 190px !important;
+        flex: 0 0 190px !important;
+        padding: 0 10px;
+        color: var(--dbx-muted-fg);
+        background: var(--dbx-muted) !important;
+        border-right: 1px solid var(--dbx-border);
+
+        &:hover {
+            color: var(--dbx-fg);
+            background: #f1f1f1;
+        }
+
+        &.active {
+            color: var(--dbx-fg);
+            background: var(--dbx-bg) !important;
+            box-shadow: inset 0 -2px #a3a3a3;
+        }
+
+        .current-tab-indicator {
+            display: none !important;
+        }
+
+        .activity-indicator {
+            display: none !important;
+        }
+
+        .index {
+            display: none !important;
+        }
+
+        .dbx-tab-icon {
+            flex: 0 0 15px;
+            width: 15px;
+            margin-right: 7px;
+            color: var(--dbx-blue);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        profile-icon {
+            display: none !important;
+        }
+
+        .name {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .buttons button {
+            color: var(--dbx-muted-fg);
+        }
     }
 
-    &>.btn-space {
+    .session-add-button {
+        flex: 0 0 var(--tabs-height);
+        width: var(--tabs-height);
+        height: var(--tabs-height);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dbx-fg);
+        background: transparent;
+        border: 0;
+        border-right: 1px solid var(--dbx-border);
+        font-size: 13px;
+
+        &:hover {
+            background: #eeeeee;
+        }
+    }
+
+    > .btn-space {
         min-width: 1px;
         flex: 1 0 1%;
-
-        .tabs-on-top & {
-            margin-top: 2px; // for window resizing
-        }
+        background: var(--dbx-muted) !important;
 
         &.drag {
             -webkit-app-region: drag;
         }
 
         &.persistent {
-        //   min-width: 72px; // 2 x 36 px height, ie 2 squares
-        // Given WCO on Windows, the min-width of the window buttons is about 138px.
-            min-width: 138px;
+            min-width: 24px;
         }
-    }
-
-    &>.window-controls-spacer {
-        min-width: 138px;
-        height: 100%;
-    }
-
-    & > .inset {
-        width: calc(70px + 15px * var(--spaciness));
-        height: var(--tabs-height);
-        flex: none;
-        -webkit-app-region: drag;
-    }
-
-    window-controls {
-        padding-left: 10px;
-    }
-
-    .cdk-drag-animating {
-        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    }
-
-    .cdk-drop-list-dragging tab-header:not(.cdk-drag-placeholder) {
-        transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
     }
 }
 
-.content {
-    flex: 1 1 0;
-    position: relative;
-    min-height: 0;
+.session-toolbar {
+    flex: 0 0 40px;
+    height: 40px;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    color: var(--dbx-fg);
+    background: var(--dbx-bg);
+    border-bottom: 1px solid var(--dbx-border);
+}
+
+.session-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.session-tool,
+.session-close {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dbx-muted-fg);
+    background: transparent;
+    border: 0;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+
+    &:hover {
+        color: var(--dbx-fg);
+        background: var(--dbx-muted);
+    }
+
+    &.primary {
+        color: #34b98b;
+        border: 1px solid #d5f0e7;
+    }
+}
+
+.session-toolbar-space {
+    flex: 1;
+    min-width: 10px;
+}
+
+.active-server-context {
+    height: 30px;
+    max-width: 220px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    color: var(--dbx-fg);
+    border-radius: 5px;
+
+    &:hover {
+        background: var(--dbx-muted);
+    }
+
+    i:first-child {
+        color: var(--dbx-blue);
+    }
+
+    strong,
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .context-chevron {
+        color: var(--dbx-muted-fg);
+        font-size: 9px;
+    }
+
+    &.secondary {
+        color: var(--dbx-muted-fg);
+
+        i:first-child {
+            color: var(--dbx-muted-fg);
+        }
+    }
+}
+
+.session-default {
+    margin-left: 4px;
+    padding: 0 8px;
+    color: var(--dbx-muted-fg);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.content.main > .content {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+    background: #151515;
 
     > .content-tab {
         position: absolute;
         top: 0;
+        left: -1000%;
         width: 100%;
         height: 100%;
-
-        left: -1000%;
 
         &.content-tab-active {
             left: 0;
@@ -191,36 +402,43 @@ $tab-border-radius: 4px;
     }
 }
 
+::ng-deep terminal-toolbar,
+::ng-deep .terminal-toolbar-spacer,
+::ng-deep .toolbar-pin-button {
+    display: none !important;
+}
+
+::ng-deep tab-header.active .buttons {
+    opacity: 1;
+}
+
 hotkey-hint {
     position: absolute;
-    bottom: 0;
     right: 0;
+    bottom: 0;
     max-width: 300px;
 }
 
-::ng-deep .btn-tab-bar svg,
-::ng-deep .btn-tab-bar + .dropdown-menu svg {
-    width: calc(22px * var(--spaciness));
-    height: calc(16px * var(--spaciness));
-    fill: white;
-    fill-opacity: 0.75;
-}
-
-::ng-deep .btn-update svg {
-    fill: cyan;
-}
-
 ::ng-deep .broadcast-status-warning {
-    background: red;
     position: absolute;
     top: 0;
     left: 50%;
-    padding: 5px 10px;
-    color: black;
-    border-radius: 0 0 5px 5px;
-
     width: 300px;
     margin-left: -150px;
+    padding: 5px 10px;
+    color: #000;
+    background: #ef4444;
+    border-radius: 0 0 5px 5px;
     text-align: center;
     font-weight: bold;
+}
+
+@media (max-width: 980px) {
+    .dbx-toolbar-action:nth-of-type(3),
+    .dbx-toolbar-action:nth-of-type(4),
+    .dbx-toolbar-icons .dbx-icon-button:nth-child(-n + 4),
+    .active-server-context.secondary,
+    .session-default {
+        display: none;
+    }
 }

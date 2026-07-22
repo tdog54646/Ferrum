@@ -21,7 +21,7 @@ appearance:
   spaciness: 1
   colorSchemeMode: 'dark'
 terminal:
-  showBuiltinProfiles: true
+  showBuiltinProfiles: false
   showRecentProfiles: 3
   paneResizeStep: 0.1
   focusFollowsMouse: false
@@ -41,7 +41,7 @@ profileDefaults:
     disableDynamicTitle: true
 recoverTabs: true
 enableAnalytics: true
-enableWelcomeTab: true
+enableWelcomeTab: false
 electronFlags:
   - ['force_discrete_gpu', '0']
 enableAutomaticUpdates: true
@@ -61,4 +61,6 @@ hacks:
   globalHotkey: null
 language: null
 defaultQuickConnectProvider: "ssh"
-showProfileTree: false
+# Ferrum keeps saved servers in a DBX-style connection rail while terminal
+# sessions remain in Tabby's native horizontal tab bar.
+showProfileTree: true

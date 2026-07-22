@@ -6,6 +6,8 @@
 .index(*ngIf='!config.store.terminal.hideTabIndex && hostApp.platform === Platform.macOS', cdkDragHandle) {{index + 1}}
 .index(*ngIf='!config.store.terminal.hideTabIndex && hostApp.platform !== Platform.macOS') {{index + 1}}
 
+i.dbx-tab-icon.fas.fa-code
+
 profile-icon(
     *ngIf='config.store.terminal.showTabProfileIcon && tab.icon',
     [icon]='tab.icon',

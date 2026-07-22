@@ -57,13 +57,36 @@ export class Window {
         this.windowConfig = new ElectronConfig({ name: 'window' })
         this.windowBounds = this.windowConfig.get('windowBoundaries')
 
+        const defaultWidth = 1280
+        const defaultHeight = 800
+        const minWidth = 900
+        const minHeight = 600
+
+        // Migrate Tabby's legacy default without overwriting a window size the
+        // user has explicitly chosen. DBX uses 1280 x 800 for its main window.
+        if (this.windowBounds?.width === 800 && this.windowBounds?.height === 600) {
+            const display = screen.getDisplayNearestPoint({
+                x: this.windowBounds.x,
+                y: this.windowBounds.y,
+            })
+            const width = Math.min(defaultWidth, display.workArea.width)
+            const height = Math.min(defaultHeight, display.workArea.height)
+            this.windowBounds = {
+                x: Math.round(display.workArea.x + (display.workArea.width - width) / 2),
+                y: Math.round(display.workArea.y + (display.workArea.height - height) / 2),
+                width,
+                height,
+            }
+            this.windowConfig.set('windowBoundaries', this.windowBounds)
+        }
+
         const maximized = this.windowConfig.get('maximized')
         const bwOptions: BrowserWindowConstructorOptions = {
-            width: 800,
-            height: 600,
+            width: defaultWidth,
+            height: defaultHeight,
             title: 'Tabby',
-            minWidth: 400,
-            minHeight: 300,
+            minWidth,
+            minHeight,
             webPreferences: {
                 nodeIntegration: true,
                 preload: path.join(__dirname, 'sentry.js'),

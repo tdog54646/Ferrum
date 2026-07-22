@@ -1,49 +1,52 @@
-.p-2.h-100.d-flex.flex-column
-    input.form-control.form-control-sm.mb-1(
-        type='text',
-        [(ngModel)]='filter',
-        [placeholder]='"Filter"|translate',
-        (ngModelChange)='onFilterChange()'
-    )
+.server-sidebar.h-100.d-flex.flex-column
+    .server-sidebar-header
+        span.server-sidebar-title 连接
+        .server-sidebar-actions
+            button(type='button', [ngbTooltip]='"Import"|translate')
+                i.fas.fa-download
+            button(type='button', [ngbTooltip]='"Export"|translate')
+                i.fas.fa-upload
+            button(type='button', [ngbTooltip]='"Collapse all"|translate')
+                i.fas.fa-angles-up
+            button(type='button', [ngbTooltip]='"New group"|translate')
+                i.far.fa-folder-open
+            button(type='button', (click)='refreshProfiles()', [ngbTooltip]='"Refresh"|translate')
+                i.fas.fa-rotate
+            button(type='button', [ngbTooltip]='"Collapse sidebar"|translate')
+                i.fas.fa-angles-left
+    .server-search-row
+        .server-search
+            i.fas.fa-magnifying-glass
+            input(
+                type='text',
+                [(ngModel)]='filter',
+                placeholder='搜索...',
+                (ngModelChange)='onFilterChange()'
+            )
+        button.server-search-tool(type='button', [ngbTooltip]='"Locate"|translate')
+            i.fas.fa-crosshairs
+        button.server-search-tool(type='button', [ngbTooltip]='"Sort"|translate')
+            i.fas.fa-list-ol
+        button.server-search-tool(type='button', [ngbTooltip]='"Filter"|translate')
+            i.fas.fa-filter
 
     .profile-tree.h-100
-        .d-flex.flex-column.p-2.profile-tree-container
-
-            ng-container(*ngFor='let group of rootGroups')
-                ng-container(*ngTemplateOutlet='recursiveGroup; context: {$implicit: group, depth: 0}')
-
-            ng-template(#recursiveGroup let-group let-depth='depth')
-                a.tree-item(
-                    (click)='toggleGroupCollapse(group)',
-                    [style.paddingLeft.px]='depth * 20',
-                    (contextmenu)='groupContextMenu(group, $event)',
-                    href='#'
-                )
-                    .fw-20
-                        .fa.fa-fw.fas.fa-chevron-right.ms-1.text-muted(*ngIf='group.collapsed')
-                        .fa.fa-fw.fas.fa-chevron-down.ms-1.text-muted(*ngIf='!group.collapsed')
-                    .fw-20
-                        profile-icon.ms-1([icon]='group.icon ?? "far fa-folder"', [color]='group?.color')
-                    span.ms-2.me-auto {{ group.name || ("Ungrouped"|translate) }}
-
-                ng-container(*ngIf='!group.collapsed')
-                    ng-container(*ngFor='let profile of group.profiles')
-                        a.tree-item(
-                            (dblclick)='launchProfile(profile)',
-                            [style.paddingLeft.px]='(depth + 1) * 20',
-                            (contextmenu)='profileContextMenu(profile, $event)',
-                            href='#'
-                        )
-                            .fw-20
-                                profile-icon.ms-1([icon]='profile.icon', [color]='profile.color')
-                            span.ms-2.no-wrap {{ profile.name }}
-
-                            .actions
-                                .action((click)='launchProfile(profile)')
-                                    .fa.fa-fw.fas.fa-play
-
-                    ng-container(*ngFor='let child of group.children')
-                        ng-container(*ngTemplateOutlet='recursiveGroup; context: {$implicit: child, depth: depth + 1}')
-.grabber(
-    (mousedown)="startResize($event)"
-)
+        .d-flex.flex-column.profile-tree-container
+            a.tree-item.server-item(
+                *ngFor='let profile of servers',
+                (click)='selectProfile(profile, $event)',
+                (dblclick)='openNewSession(profile, $event)',
+                [class.selected]='isSelectedProfile(profile)',
+                (contextmenu)='profileContextMenu(profile, $event)',
+                href='#'
+            )
+                i.server-chevron.fas.fa-chevron-right
+                i.server-icon.fas.fa-server
+                span.profile-name {{ profile.name }}
+                span.session-status(*ngIf='hasOpenSession(profile)')
+                .actions
+                    .action((click)='openNewSession(profile, $event)', [ngbTooltip]='"New session"|translate')
+                        .fa.fa-fw.fas.fa-plus
+            .server-empty(*ngIf='servers.length == 0')
+                span 未找到 SSH 连接
+.grabber((mousedown)='startResize($event)')

@@ -1,0 +1,12 @@
+{
+  "name": "tabby-tauri",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tauri host adapter for the Ferrum Tabby fork",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "webpack --progress --color",
+    "check:rust": "cargo check --manifest-path src-tauri/Cargo.toml"
+  },
+  "devDependencies": {}
+}

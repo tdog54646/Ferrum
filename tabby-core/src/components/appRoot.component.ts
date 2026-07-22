@@ -16,6 +16,7 @@ import { BaseTabComponent } from './baseTab.component'
 import { SafeModeModalComponent } from './safeModeModal.component'
 import { TabBodyComponent } from './tabBody.component'
 import { SplitTabComponent } from './splitTab.component'
+import { ProfileTreeComponent } from './profileTree.component'
 import { AppService, Command, CommandLocation, FileTransfer, HostWindowService, PlatformService } from '../api'
 
 function makeTabAnimation (dimension: string, size: number) {
@@ -72,6 +73,7 @@ export class AppRootComponent {
     @HostBinding('class.no-tabs') noTabs = true
     @ViewChildren(TabBodyComponent) tabBodies: TabBodyComponent[]
     @ViewChild('activeTransfersDropdown') activeTransfersDropdown: NgbDropdown
+    @ViewChild(ProfileTreeComponent) profileTree?: ProfileTreeComponent
     unsortedTabs: BaseTabComponent[] = []
     updatesAvailable = false
     activeTransfers: FileTransfer[] = []
@@ -229,6 +231,65 @@ export class AppRootComponent {
             return '*'
         }
         return this.config.store.appearance.flexTabs ? '*' : '200px'
+    }
+
+    async openConnectionSelector (): Promise<void> {
+        await this.leftToolbarButtons?.[0]?.run?.()
+    }
+
+    async openSessionForSelectedServer (): Promise<void> {
+        if (await this.profileTree?.openSessionForSelectedProfile()) {
+            return
+        }
+        await this.openConnectionSelector()
+    }
+
+    get activeServerName (): string {
+        return this.activeLeafTab()?.profile?.name ?? this.app.activeTab?.customTitle ?? this.app.activeTab?.title ?? '终端会话'
+    }
+
+    get activeServerDescription (): string {
+        const profile = this.activeLeafTab()?.profile
+        if (!profile) {
+            return ''
+        }
+        const user = profile.options?.user
+        const host = profile.options?.host
+        const port = profile.options?.port
+        if (!host) {
+            return ''
+        }
+        return `${user ? `${user}@` : ''}${host}${port && port !== 22 ? `:${port}` : ''}`
+    }
+
+    restartActiveSession (): void {
+        if (this.app.activeTab) {
+            this.app.restartTab(this.app.activeTab)
+        }
+    }
+
+    closeActiveSession (): void {
+        if (this.app.activeTab) {
+            this.app.closeTab(this.app.activeTab, true)
+        }
+    }
+
+    async openActiveSFTP (): Promise<void> {
+        await this.activeLeafTab()?.openSFTP?.()
+    }
+
+    async openSettings (): Promise<void> {
+        await this.rightToolbarButtons?.[this.rightToolbarButtons.length - 1]?.run?.()
+    }
+
+    private activeLeafTab (): any {
+        const tab: any = this.app.activeTab
+        if (!tab) {
+            return null
+        }
+        return typeof tab.getFocusedTab === 'function'
+            ? tab.getFocusedTab() ?? tab.getAllTabs?.()[0]
+            : tab
     }
 
     onTabsReordered (event: CdkDragDrop<BaseTabComponent[]>) {

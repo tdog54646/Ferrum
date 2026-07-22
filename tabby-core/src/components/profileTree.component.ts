@@ -26,14 +26,17 @@ interface CollapsableProfileGroup extends ProfileGroup {
 export class ProfileTreeComponent extends BaseComponent {
     profileGroups: PartialProfileGroup<ProfileGroup>[] = []
     rootGroups: PartialProfileGroup<ProfileGroup>[] = []
+    allServers: PartialProfile<Profile>[] = []
+    servers: PartialProfile<Profile>[] = []
 
     filteredProfiles: PartialProfile<Profile>[] = []
     @Input() filter = ''
+    selectedProfile: PartialProfile<Profile>|null = null
 
 
     panelMinWidth = 200
     panelMaxWidth = 600
-    panelInternalWidth: number = parseInt(window.localStorage.profileTreeWidth ?? '300')
+    panelInternalWidth: number = parseInt(window.localStorage.profileTreeWidth ?? '260')
     panelStartWidth = this.panelInternalWidth
     panelIsResizing = false
     panelStartX = 0
@@ -78,6 +81,13 @@ export class ProfileTreeComponent extends BaseComponent {
         groups.sort((a, b) => (a.id === 'ungrouped' ? 0 : 1) - (b.id === 'ungrouped' ? 0 : 1))
         this.profileGroups = groups.map(g => ProfileTreeComponent.intoPartialCollapsableProfileGroup(g, profileGroupCollapsed[g.id] ?? false))
         this.rootGroups = this.profilesService.buildGroupTree(this.profileGroups)
+        this.allServers = this.collectProfiles(this.rootGroups)
+            .filter(profile => profile.type === 'ssh' || profile.type === 'telnet')
+            .sort((a, b) => a.name.localeCompare(b.name))
+        this.servers = [...this.allServers]
+        if (this.selectedProfile?.id) {
+            this.selectedProfile = this.findProfile(this.selectedProfile.id) ?? this.selectedProfile
+        }
     }
 
     private async editProfile (profile: PartialProfile<Profile>): Promise<void> {
@@ -192,11 +202,104 @@ export class ProfileTreeComponent extends BaseComponent {
     }
 
     private async tabStateChanged (): Promise<void> {
-        // TODO: show active tab in the side panel with eye icon
+        const profile = this.profileForTab(this.app.activeTab)
+        if (profile?.id) {
+            this.selectedProfile = this.findProfile(profile.id) ?? profile
+        }
     }
 
     async launchProfile<P extends Profile> (profile: PartialProfile<P>): Promise<any> {
         return this.profilesService.launchProfile(profile)
+    }
+
+    async selectProfile (profile: PartialProfile<Profile>, event?: MouseEvent): Promise<void> {
+        event?.preventDefault()
+        this.selectedProfile = profile
+        const openTab = [...this.app.tabs].reverse().find(tab => this.tabContainsProfile(tab, profile.id))
+        if (openTab) {
+            this.app.selectTab(openTab)
+            return
+        }
+        await this.profilesService.openNewTabForProfile(profile)
+    }
+
+    async openNewSession (profile: PartialProfile<Profile>, event?: MouseEvent): Promise<void> {
+        event?.preventDefault()
+        event?.stopPropagation()
+        this.selectedProfile = profile
+        await this.profilesService.openNewTabForProfile(profile)
+    }
+
+    async openSessionForSelectedProfile (): Promise<boolean> {
+        const profile = this.selectedProfile ?? this.profileForTab(this.app.activeTab)
+        if (!profile) {
+            return false
+        }
+        this.selectedProfile = profile.id ? this.findProfile(profile.id) ?? profile : profile
+        await this.profilesService.openNewTabForProfile(this.selectedProfile)
+        return true
+    }
+
+    isSelectedProfile (profile: PartialProfile<Profile>): boolean {
+        return Boolean(profile.id && profile.id === this.selectedProfile?.id)
+    }
+
+    hasOpenSession (profile: PartialProfile<Profile>): boolean {
+        return this.app.tabs.some(tab => this.tabContainsProfile(tab, profile.id))
+    }
+
+    profileDescription (profile: PartialProfile<Profile>): string {
+        return this.profilesService.getDescription(profile) ?? ''
+    }
+
+    async refreshProfiles (): Promise<void> {
+        await this.loadTreeItems()
+    }
+
+    private tabContainsProfile (tab: any, profileID?: string): boolean {
+        if (!profileID) {
+            return false
+        }
+        const leaves = typeof tab?.getAllTabs === 'function' ? tab.getAllTabs() : [tab]
+        return leaves.some((leaf: any) => leaf?.profile?.id === profileID)
+    }
+
+    private profileForTab (tab: any): PartialProfile<Profile>|null {
+        if (!tab) {
+            return null
+        }
+        const focused = typeof tab.getFocusedTab === 'function' ? tab.getFocusedTab() : null
+        if (focused?.profile) {
+            return focused.profile
+        }
+        const leaves = typeof tab.getAllTabs === 'function' ? tab.getAllTabs() : [tab]
+        return leaves.find((leaf: any) => leaf?.profile)?.profile ?? null
+    }
+
+    private findProfile (id: string): PartialProfile<Profile>|null {
+        const visit = (groups: PartialProfileGroup<CollapsableProfileGroup>[]): PartialProfile<Profile>|null => {
+            for (const group of groups) {
+                const profile = group.profiles?.find(x => x.id === id)
+                if (profile) {
+                    return profile
+                }
+                const child = visit(group.children ?? [])
+                if (child) {
+                    return child
+                }
+            }
+            return null
+        }
+        return visit(this.rootGroups)
+    }
+
+    private collectProfiles (groups: PartialProfileGroup<CollapsableProfileGroup>[]): PartialProfile<Profile>[] {
+        const profiles: PartialProfile<Profile>[] = []
+        for (const group of groups) {
+            profiles.push(...(group.profiles ?? []))
+            profiles.push(...this.collectProfiles(group.children ?? []))
+        }
+        return profiles
     }
 
     async onFilterChange (): Promise<void> {
@@ -204,30 +307,14 @@ export class ProfileTreeComponent extends BaseComponent {
             const q = this.filter.trim().toLowerCase()
 
             if (q.length === 0) {
-                this.rootGroups = this.profilesService.buildGroupTree(this.profileGroups)
+                this.servers = [...this.allServers]
                 return
             }
-
-            const profiles = await this.profilesService.getProfiles({
-                includeBuiltin: this.config.store.terminal.showBuiltinProfiles,
-                clone: true,
-            })
-
-            const matches = new FuzzySearch(
-                profiles.filter(p => !p.isTemplate),
+            this.servers = new FuzzySearch(
+                this.allServers,
                 ['name', 'description'],
                 { sort: false },
             ).search(q)
-
-            this.rootGroups = [
-                {
-                    id: 'search',
-                    editable: false,
-                    name: this.translate.instant('Filter results'),
-                    icon: 'fas fa-magnifying-glass',
-                    profiles: matches,
-                },
-            ]
         } catch (error) {
             console.error('Error occurred during search:', error)
         }
