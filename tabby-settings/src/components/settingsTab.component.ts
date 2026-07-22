@@ -29,7 +29,7 @@ import { ReleaseNotesComponent } from './releaseNotesTab.component'
     ],
 })
 export class SettingsTabComponent extends BaseTabComponent {
-    @Input() activeTab: string
+    @Input() activeTab = 'terminal-appearance'
     Platform = Platform
     configDefaults: any
     configFile: string

@@ -1,8 +1,11 @@
 .content
+    .settings-heading
+        i.fas.fa-gear
+        h2(translate) Settings
+
     ul.nav-pills(ngbNav, #nav='ngbNav', [activeId]='activeTab', orientation='vertical')
         li(ngbNavItem='application')
             a(ngbNavLink, draggable='false')
-                i.fas.fa-fw.fa-window-maximize.me-2
                 span(translate) Application
             ng-template(ngbNavContent)
                 .content-box
@@ -123,7 +126,6 @@
         ng-container(*ngFor='let provider of settingsProviders')
             li(*ngIf='provider.prioritized', [ngbNavItem]='provider.id')
                 a.d-flex.align-items-center(ngbNavLink, draggable='false')
-                    i(class='fas fa-fw me-2 fa-{{provider.icon}}')
                     span {{provider.title|translate}}
                 ng-template(ngbNavContent)
                     settings-tab-body([provider]='provider')
@@ -133,14 +135,12 @@
         ng-container(*ngFor='let provider of settingsProviders')
             li(*ngIf='!provider.prioritized', [ngbNavItem]='provider.id')
                 a.d-flex.align-items-center(ngbNavLink, draggable='false')
-                    i(class='fas fa-fw me-2 fa-{{provider.icon || "puzzle-piece"}}')
                     span {{provider.title|translate}}
                 ng-template(ngbNavContent)
                     settings-tab-body([provider]='provider')
 
         li(ngbNavItem='config-file')
             a.d-flex.align-items-center(ngbNavLink, draggable='false')
-                i.fas.fa-fw.fa-code.me-2
                 span(translate) Config file
             ng-template.test(ngbNavContent)
                 .d-flex.flex-column.w-100.h-100
