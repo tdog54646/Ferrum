@@ -81,7 +81,7 @@
                 div {{item.name}}
                 .me-auto
                 .size(*ngIf='!item.isDirectory') {{item.size|filesize}}
-                .date {{item.modified|tabbyDate}}
+                .date {{item.modified|ferrumDate}}
                 .mode {{getModeString(item)}}
         .alert.alert-info.text-center.mt-3(*ngIf='fileList !== null && filteredFileList.length === 0 && showFilter && filterText.trim() !== ""')
             i.fas.fa-search.me-2

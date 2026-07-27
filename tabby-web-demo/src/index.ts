@@ -3,8 +3,8 @@ import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 
-import TabbyCorePlugin, { ProfileProvider, AppService } from 'tabby-core'
-import TabbyTerminalModule from 'tabby-terminal'
+import FerrumCorePlugin, { ProfileProvider, AppService } from 'tabby-core'
+import FerrumTerminalModule from 'tabby-terminal'
 
 import { DemoTerminalTabComponent } from './components/terminalTab.component'
 import { DemoProfilesService } from './profiles'
@@ -15,8 +15,8 @@ import { DemoProfilesService } from './profiles'
         // BrowserModule,
         FormsModule,
         NgbModule,
-        TabbyCorePlugin,
-        TabbyTerminalModule,
+        FerrumCorePlugin,
+        FerrumTerminalModule,
     ],
     providers: [
         { provide: ProfileProvider, useClass: DemoProfilesService, multi: true },

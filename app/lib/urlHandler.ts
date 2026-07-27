@@ -1,13 +1,13 @@
 import { createParserConfig } from './cli'
 import { parse as parseShellCommand } from 'shell-quote'
 
-export function isTabbyURL (arg: string): boolean {
-    return arg.toLowerCase().startsWith('tabby://')
+export function isFerrumURL (arg: string): boolean {
+    return arg.toLowerCase().startsWith('ferrum://')
 }
 
-export function parseTabbyURL (url: string, cwd: string = process.cwd()): any {
+export function parseFerrumURL (url: string, cwd: string = process.cwd()): any {
     try {
-        if (!isTabbyURL(url)) {
+        if (!isFerrumURL(url)) {
             return null
         }
 
@@ -20,7 +20,7 @@ export function parseTabbyURL (url: string, cwd: string = process.cwd()): any {
             return command.toLowerCase() === primaryCommand.split(/\s+/)[0].toLowerCase()
         })
         if (!commandConfig) {
-            console.error(`Unknown command in tabby:// URL: ${command}`)
+            console.error(`Unknown command in ferrum:// URL: ${command}`)
             return null
         }
         const primaryCommand = Array.isArray(commandConfig.command) ? commandConfig.command[0] : commandConfig.command
@@ -56,7 +56,7 @@ export function parseTabbyURL (url: string, cwd: string = process.cwd()): any {
         console.log(`URL Handler - Safely parsed [${url}] to:`, JSON.stringify(argv))
         return argv
     } catch (e) {
-        console.error('Failed to parse tabby:// URL:', e)
+        console.error('Failed to parse ferrum:// URL:', e)
         return null
     }
 }

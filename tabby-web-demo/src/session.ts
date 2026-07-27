@@ -7,7 +7,7 @@ import { Logger } from 'tabby-core'
 const currentScript: any = document.currentScript
 
 export class Session extends BaseSession {
-    private dataPath = window['tabbyWebDemoDataPath'] ?? currentScript.src + '../../../data'
+    private dataPath = window['ferrumWebDemoDataPath'] ?? currentScript.src + '../../../data'
     private vm: any
     private zone: NgZone
     static v86Loaded = false

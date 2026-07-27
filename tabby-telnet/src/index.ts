@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { ToastrModule } from 'ngx-toastr'
 import { NgxFilesizeModule } from 'ngx-filesize'
-import TabbyCoreModule, { ConfigProvider, TabRecoveryProvider, HotkeyProvider, ProfileProvider } from 'tabby-core'
-import TabbyTerminalModule from 'tabby-terminal'
+import FerrumCoreModule, { ConfigProvider, TabRecoveryProvider, HotkeyProvider, ProfileProvider } from 'tabby-core'
+import FerrumTerminalModule from 'tabby-terminal'
 
 import { TelnetProfileSettingsComponent } from './components/telnetProfileSettings.component'
 import { TelnetTabComponent } from './components/telnetTab.component'
@@ -23,8 +23,8 @@ import { TelnetProfilesService } from './profiles'
         CommonModule,
         FormsModule,
         ToastrModule,
-        TabbyCoreModule,
-        TabbyTerminalModule,
+        FerrumCoreModule,
+        FerrumTerminalModule,
     ],
     providers: [
         { provide: ConfigProvider, useClass: TelnetConfigProvider, multi: true },

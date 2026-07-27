@@ -259,9 +259,9 @@ export class LocaleService {
 }
 
 @Pipe({
-    name: 'tabbyDate',
+    name: 'ferrumDate',
 })
-export class TabbyFormatedDatePipe implements PipeTransform {
+export class FerrumFormattedDatePipe implements PipeTransform {
 
     constructor (private locale: LocaleService) {}
 

@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { ToastrModule } from 'ngx-toastr'
 
-import TabbyCorePlugin, { HostAppService, ToolbarButtonProvider, TabRecoveryProvider, ConfigProvider, HotkeysService, HotkeyProvider, TabContextMenuItemProvider, CLIHandler, ProfileProvider } from 'tabby-core'
-import TabbyTerminalModule from 'tabby-terminal'
+import FerrumCorePlugin, { HostAppService, ToolbarButtonProvider, TabRecoveryProvider, ConfigProvider, HotkeysService, HotkeyProvider, TabContextMenuItemProvider, CLIHandler, ProfileProvider } from 'tabby-core'
+import FerrumTerminalModule from 'tabby-terminal'
 import { SettingsTabProvider } from 'tabby-settings'
 
 import { TerminalTabComponent } from './components/terminalTab.component'
@@ -33,8 +33,8 @@ import { LocalProfilesService } from './profiles'
         FormsModule,
         NgbModule,
         ToastrModule,
-        TabbyCorePlugin,
-        TabbyTerminalModule,
+        FerrumCorePlugin,
+        FerrumTerminalModule,
     ],
     providers: [
         { provide: SettingsTabProvider, useClass: ShellSettingsTabProvider, multi: true },

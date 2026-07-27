@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { InfiniteScrollModule } from 'ngx-infinite-scroll'
 
-import TabbyCorePlugin, { ToolbarButtonProvider, HotkeyProvider, ConfigProvider, HotkeysService, AppService } from 'tabby-core'
+import FerrumCorePlugin, { ToolbarButtonProvider, HotkeyProvider, ConfigProvider, HotkeysService, AppService } from 'tabby-core'
 
 import { EditProfileModalComponent } from './components/editProfileModal.component'
 import { EditProfileGroupModalComponent } from './components/editProfileGroupModal.component'
@@ -34,7 +34,7 @@ import { HotkeySettingsTabProvider, WindowSettingsTabProvider, VaultSettingsTabP
         CommonModule,
         FormsModule,
         NgbModule,
-        TabbyCorePlugin,
+        FerrumCorePlugin,
         InfiniteScrollModule,
     ],
     providers: [

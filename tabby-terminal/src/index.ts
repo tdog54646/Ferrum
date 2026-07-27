@@ -5,7 +5,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { ToastrModule } from 'ngx-toastr'
 import { NgxColorsModule } from 'ngx-colors'
 
-import TabbyCorePlugin, { ConfigProvider, HotkeyProvider, TabContextMenuItemProvider, CLIHandler } from 'tabby-core'
+import FerrumCorePlugin, { ConfigProvider, HotkeyProvider, TabContextMenuItemProvider, CLIHandler } from 'tabby-core'
 import { SettingsTabProvider } from 'tabby-settings'
 
 import { AppearanceSettingsTabComponent } from './components/appearanceSettingsTab.component'
@@ -43,7 +43,7 @@ import { DefaultColorSchemes } from './colorSchemes'
         FormsModule,
         NgbModule,
         ToastrModule,
-        TabbyCorePlugin,
+        FerrumCorePlugin,
         NgxColorsModule,
     ],
     providers: [

@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { ToastrModule } from 'ngx-toastr'
 import { NgxFilesizeModule } from 'ngx-filesize'
-import TabbyCoreModule, { ConfigProvider, TabRecoveryProvider, HotkeyProvider, TabContextMenuItemProvider, ProfileProvider } from 'tabby-core'
+import FerrumCoreModule, { ConfigProvider, TabRecoveryProvider, HotkeyProvider, TabContextMenuItemProvider, ProfileProvider } from 'tabby-core'
 import { SettingsTabProvider } from 'tabby-settings'
-import TabbyTerminalModule from 'tabby-terminal'
+import FerrumTerminalModule from 'tabby-terminal'
 
 import { SSHProfileSettingsComponent } from './components/sshProfileSettings.component'
 import { SSHPortForwardingModalComponent } from './components/sshPortForwardingModal.component'
@@ -36,8 +36,8 @@ import { SFTPCreateDirectoryModalComponent } from './components/sftpCreateDirect
         CommonModule,
         FormsModule,
         ToastrModule,
-        TabbyCoreModule,
-        TabbyTerminalModule,
+        FerrumCoreModule,
+        FerrumTerminalModule,
     ],
     providers: [
         { provide: ConfigProvider, useClass: SSHConfigProvider, multi: true },

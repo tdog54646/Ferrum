@@ -46,7 +46,7 @@ async function prefetchURL (url) {
     await (await fetch(url)).text()
 }
 
-const Tabby = {
+const Ferrum = {
     registerMock: (name, mod) => {
         mocks[name] = mod
     },
@@ -59,30 +59,30 @@ const Tabby = {
         return { ...pkg, url }
     },
     registerPluginModule: (packageName, module) => {
-        Tabby.registerModule(`resources/builtin-plugins/${packageName}`, module)
-        Tabby.registerModule(packageName, module)
+        Ferrum.registerModule(`resources/builtin-plugins/${packageName}`, module)
+        Ferrum.registerModule(packageName, module)
     },
     loadPlugin: async (url) => {
-        const info = await Tabby.resolvePluginInfo(url)
+        const info = await Ferrum.resolvePluginInfo(url)
         const module = await webRequire(info.url)
-        Tabby.registerPluginModule(info.name, module)
+        Ferrum.registerPluginModule(info.name, module)
         return module
     },
     loadPlugins: async (urls, progressCallback) => {
-        const infos: any[] = await Promise.all(urls.map(Tabby.resolvePluginInfo))
+        const infos: any[] = await Promise.all(urls.map(Ferrum.resolvePluginInfo))
         progressCallback?.(0, 1)
         await Promise.all(infos.map(x => prefetchURL(x.url)))
         const pluginModules = []
         for (const info of infos) {
             const module = await webRequire(info.url)
-            Tabby.registerPluginModule(info.name, module)
+            Ferrum.registerPluginModule(info.name, module)
             pluginModules.push(module)
             progressCallback?.(infos.indexOf(info), infos.length)
         }
         progressCallback?.(1, 1)
         return pluginModules
     },
-    bootstrap: (...args) => window['bootstrapTabby'](...args),
+    bootstrap: (...args) => window['bootstrapFerrum'](...args),
     webRequire,
 }
 
@@ -91,12 +91,12 @@ Object.assign(window, {
     module: {
         paths: [],
     },
-    Tabby,
+    Ferrum,
     __filename: '',
     __dirname: '',
     process: {
         env: { },
-        argv: ['tabby'],
+        argv: ['ferrum'],
         platform: 'darwin',
         on: () => null,
         stdout: {},
