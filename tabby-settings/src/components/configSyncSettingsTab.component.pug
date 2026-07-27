@@ -8,22 +8,16 @@ ul.nav-tabs(ngbNav, #nav='ngbNav')
                 .header
                     .title(translate) Sync host
 
-                .input-group.w-50
-                    input.form-control(
-                        type='text',
-                        [(ngModel)]='config.store.configSync.host',
-                        (keydown.enter)='config.save()',
-                    )
-                    button.btn.btn-secondary(
-                        *ngIf='config.store.configSync.host',
-                        (click)='openSyncHost()'
-                    )
-                        i.fas.fa-external-link-alt
+                input.form-control.w-50(
+                    type='text',
+                    [(ngModel)]='config.store.configSync.host',
+                    (keydown.enter)='config.save()',
+                )
 
             .form-line(*ngIf='config.store.configSync.host')
                 .header
                     .title(translate) Secret sync token
-                    .description(translate) Get it from the Tabby Web settings window
+                    .description(translate) Token issued by your configuration sync service
 
                 .input-group
                     input.form-control(
@@ -35,11 +29,6 @@ ul.nav-tabs(ngbNav, #nav='ngbNav')
                         i.fas.fa-fw.fa-circle-notch.fa-spin.text-warning(*ngIf='connectionSuccessful === null')
                         i.fas.fa-fw.fa-check.text-success(*ngIf='connectionSuccessful')
                         i.fas.fa-fw.fa-exclamation-triangle.text-danger(*ngIf='connectionSuccessful === false')
-
-            .alert.alert-info.d-flex.align-items-center
-                .me-auto
-                    span(translate) Config sync requires an instance of the Tabby Web service.
-                    a.ml-1((click)='openTabbyWebInfo()', href='#', translate) Learn more
 
             ng-container(*ngIf='config.store.configSync.token')
                 .alert.alert-danger(*ngIf='connectionSuccessful === false')
