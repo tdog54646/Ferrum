@@ -73,7 +73,13 @@ export class ElectronHostAppService extends HostAppService {
         } else {
             let args: string[] = []
             if (this.platform === Platform.Linux) {
-                args = ['--no-sandbox']
+                args.push('--no-sandbox')
+            }
+            // In development, Electron is the executable and Ferrum is an
+            // argument. Relaunching without the app path opens Electron's
+            // built-in welcome page instead of restarting Ferrum.
+            if (process.defaultApp) {
+                args.push(this.electron.app.getAppPath())
             }
             this.electron.app.relaunch({ args })
         }

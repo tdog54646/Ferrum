@@ -1,4 +1,7 @@
 {
+  "name": "ferrum-workspace",
+  "version": "1.0.0",
+  "main": "scripts/electron-entry.cjs",
   "devDependencies": {
     "@angular/animations": "^15.2.6",
     "@angular/cdk": "^15.2.6",
@@ -102,9 +105,9 @@
     "build": "npm run build:typings && node scripts/build-modules.mjs",
     "build:typings": "node scripts/build-typings.mjs",
     "watch": "cross-env TABBY_DEV=1 webpack --progress --color --watch",
-    "start": "cross-env TABBY_DEV=1 electron app -d --inspect",
-    "start:prod": "electron app --debug",
-    "prod": "cross-env TABBY_DEV=1 electron app",
+    "start": "cross-env TABBY_DEV=1 electron . -d --inspect",
+    "start:prod": "electron . --debug",
+    "prod": "cross-env TABBY_DEV=1 electron .",
     "docs": "node scripts/build-docs.mjs",
     "lint": "eslint --ext ts */src */lib",
     "postinstall": "patch-package && node ./scripts/install-deps.mjs && node ./scripts/build-native.mjs",
