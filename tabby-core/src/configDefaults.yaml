@@ -59,6 +59,6 @@ hacks:
   globalHotkey: null
 language: null
 defaultQuickConnectProvider: "ssh"
-# Ferrum keeps saved servers in a DBX-style connection rail while terminal
-# sessions remain in Tabby's native horizontal tab bar.
+# Saved servers use a DBX-style connection rail while terminal sessions remain
+# in the native horizontal tab bar.
 showProfileTree: true
