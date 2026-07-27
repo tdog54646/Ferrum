@@ -1,6 +1,5 @@
 import { Component } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
-import { HomeBaseService } from '../services/homeBase.service'
 import { CommandService } from '../services/commands.service'
 import { Command, CommandLocation } from '../api/commands'
 
@@ -11,12 +10,10 @@ import { Command, CommandLocation } from '../api/commands'
     styleUrls: ['./startPage.component.scss'],
 })
 export class StartPageComponent {
-    version: string
     commands: Command[] = []
 
     constructor (
         private domSanitizer: DomSanitizer,
-        public homeBase: HomeBaseService,
         commands: CommandService,
     ) {
         commands.getCommands({}).then(c => {

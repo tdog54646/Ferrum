@@ -1,4 +1,4 @@
-import { app, ipcMain, Menu, Tray, shell, screen, globalShortcut, MenuItemConstructorOptions, WebContents } from 'electron'
+import { app, ipcMain, Menu, Tray, screen, globalShortcut, MenuItemConstructorOptions, WebContents } from 'electron'
 import promiseIpc from 'electron-promise-ipc'
 import * as remote from '@electron/remote/main'
 import { spawnSync } from 'child_process'
@@ -210,7 +210,7 @@ export class Application {
             this.tray.setContextMenu(contextMenu)
         }
 
-        this.tray.setToolTip(`Tabby ${app.getVersion()}`)
+        this.tray.setToolTip(`Ferrum ${app.getVersion()}`)
     }
 
     disableTray (): void {
@@ -309,8 +309,6 @@ export class Application {
             {
                 label: 'Application',
                 submenu: [
-                    { role: 'about', label: 'About Tabby' },
-                    { type: 'separator' },
                     {
                         label: 'Preferences',
                         accelerator: 'Cmd+,',
@@ -367,17 +365,6 @@ export class Application {
                     { role: 'zoom' },
                     { type: 'separator' },
                     { role: 'front' },
-                ],
-            },
-            {
-                role: 'help',
-                submenu: [
-                    {
-                        label: 'Website',
-                        click () {
-                            shell.openExternal('https://eugeny.github.io/tabby')
-                        },
-                    },
                 ],
             },
         ]

@@ -434,11 +434,9 @@ export class ConfigService {
             config.version = 6
         }
         if (config.version < 7) {
-            if (!config.configSync?.host || config.configSync?.host === 'https://api.tabby.sh') {
-                config.configSync ??= {}
-                delete config.configSync.host
-                delete config.configSync.token
-            }
+            config.configSync ??= {}
+            delete config.configSync.host
+            delete config.configSync.token
             config.version = 7
         }
         if (config.version < 8) {
@@ -451,6 +449,12 @@ export class ConfigService {
                 }
             }
             config.version = 8
+        }
+        if (config.version < 9) {
+            delete config.enableAnalytics
+            delete window.localStorage.analyticsUserID
+            delete window.localStorage.installEventSent
+            config.version = 9
         }
     }
 

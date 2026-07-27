@@ -8,17 +8,13 @@ import {
     BaseTabComponent,
     HostAppService,
     Platform,
-    HomeBaseService,
-    UpdaterService,
     PlatformService,
     HostWindowService,
-    AppService,
     LocaleService,
     TranslateService,
 } from 'tabby-core'
 
 import { SettingsTabProvider } from '../api'
-import { ReleaseNotesComponent } from './releaseNotesTab.component'
 
 /** @hidden */
 @Component({
@@ -34,8 +30,6 @@ export class SettingsTabComponent extends BaseTabComponent {
     configDefaults: any
     configFile: string
     isShellIntegrationInstalled = false
-    checkingForUpdate = false
-    updateAvailable = false
     showConfigDefaults = false
     allLanguages = LocaleService.allLanguages
     @HostBinding('class.pad-window-controls') padWindowControls = false
@@ -44,11 +38,8 @@ export class SettingsTabComponent extends BaseTabComponent {
         public config: ConfigService,
         public hostApp: HostAppService,
         public hostWindow: HostWindowService,
-        public homeBase: HomeBaseService,
         public platform: PlatformService,
         public locale: LocaleService,
-        public updater: UpdaterService,
-        private app: AppService,
         @Inject(SettingsTabProvider) public settingsProviders: SettingsTabProvider[],
         translate: TranslateService,
         injector: Injector,
@@ -117,17 +108,5 @@ export class SettingsTabComponent extends BaseTabComponent {
         } catch {
             return false
         }
-    }
-
-    async checkForUpdates () {
-        this.checkingForUpdate = true
-        this.updateAvailable = await this.updater.check()
-        this.checkingForUpdate = false
-    }
-
-    showReleaseNotes () {
-        this.app.openNewTabRaw({
-            type: ReleaseNotesComponent,
-        })
     }
 }

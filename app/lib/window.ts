@@ -1,5 +1,4 @@
 import * as glasstron from 'glasstron'
-import { autoUpdater } from 'electron-updater'
 import { Subject, Observable, debounceTime } from 'rxjs'
 import { BrowserWindow, app, ipcMain, Rectangle, Menu, screen, BrowserWindowConstructorOptions, TouchBar, nativeImage, WebContents, nativeTheme } from 'electron'
 import ElectronConfig = require('electron-config')
@@ -11,7 +10,7 @@ import { compare as compareVersions } from 'compare-versions'
 
 import type { Application } from './app'
 import { parseArgs } from './cli'
-import { parseTabbyURL, isTabbyURL } from './urlHandler'
+import { parseFerrumURL, isFerrumURL } from './urlHandler'
 
 let DwmEnableBlurBehindWindow: any = null
 if (process.platform === 'win32') {
@@ -62,7 +61,7 @@ export class Window {
         const minWidth = 900
         const minHeight = 600
 
-        // Migrate Tabby's legacy default without overwriting a window size the
+        // Migrate the legacy default without overwriting a window size the
         // user has explicitly chosen. DBX uses 1280 x 800 for its main window.
         if (this.windowBounds?.width === 800 && this.windowBounds?.height === 600) {
             const display = screen.getDisplayNearestPoint({
@@ -84,7 +83,7 @@ export class Window {
         const bwOptions: BrowserWindowConstructorOptions = {
             width: defaultWidth,
             height: defaultHeight,
-            title: 'Tabby',
+            title: 'Ferrum',
             minWidth,
             minHeight,
             webPreferences: {
@@ -190,7 +189,6 @@ export class Window {
         }
 
         this.setupWindowManagement()
-        this.setupUpdater()
 
         this.ready = new Promise(resolve => {
             const listener = event => {
@@ -303,9 +301,9 @@ export class Window {
     }
 
     passCliArguments (argv: string[], cwd: string, secondInstance: boolean): void {
-        const urlArg = argv.find(arg => isTabbyURL(arg))
+        const urlArg = argv.find(arg => isFerrumURL(arg))
         if (urlArg) {
-            this.send('cli', parseTabbyURL(urlArg, cwd), cwd, secondInstance)
+            this.send('cli', parseFerrumURL(urlArg, cwd), cwd, secondInstance)
         } else {
             this.send('cli', parseArgs(argv, cwd), cwd, secondInstance)
         }
@@ -508,35 +506,6 @@ export class Window {
                 return
             }
             listener(e, ...args)
-        })
-    }
-
-    private setupUpdater () {
-        autoUpdater.autoDownload = true
-        autoUpdater.autoInstallOnAppQuit = true
-
-        autoUpdater.on('update-available', () => {
-            this.send('updater:update-available')
-        })
-
-        autoUpdater.on('update-not-available', () => {
-            this.send('updater:update-not-available')
-        })
-
-        autoUpdater.on('error', err => {
-            this.send('updater:error', err)
-        })
-
-        autoUpdater.on('update-downloaded', () => {
-            this.send('updater:update-downloaded')
-        })
-
-        this.on('updater:check-for-updates', () => {
-            autoUpdater.checkForUpdates()
-        })
-
-        this.on('updater:quit-and-install', () => {
-            autoUpdater.quitAndInstall()
         })
     }
 
