@@ -1,11 +1,10 @@
 {
-  "name": "tabby",
-  "description": "A terminal for a modern age",
+  "name": "ferrum",
+  "description": "A focused terminal and server manager",
   "private": true,
-  "repository": "https://github.com/Eugeny/tabby",
+  "repository": "https://github.com/tdog54646/Ferrum",
   "author": {
-    "name": "Tabby Developers",
-    "email": "e@ajenti.org"
+    "name": "Ferrum Developers"
   },
   "main": "dist/main.js",
   "version": "1.0.0-alpha.1",
