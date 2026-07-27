@@ -1,12 +1,13 @@
 :host {
-    --dbx-bg: #ffffff;
-    --dbx-fg: #0a0a0a;
-    --dbx-muted: #f5f5f5;
-    --dbx-muted-soft: #fafafa;
-    --dbx-muted-fg: #737373;
-    --dbx-border: #e5e5e5;
-    --dbx-selected: #e7f0ff;
-    --dbx-blue: #2563eb;
+    --dbx-bg: var(--theme-bg, var(--bs-body-bg));
+    --dbx-fg: var(--theme-fg, var(--bs-body-color));
+    --dbx-muted: color-mix(in srgb, var(--dbx-fg) 7%, var(--dbx-bg));
+    --dbx-muted-soft: color-mix(in srgb, var(--dbx-fg) 3%, var(--dbx-bg));
+    --dbx-muted-fg: color-mix(in srgb, var(--dbx-fg) 62%, var(--dbx-bg));
+    --dbx-border: color-mix(in srgb, var(--dbx-fg) 15%, transparent);
+    --dbx-selected: color-mix(in srgb, var(--theme-primary) 18%, var(--dbx-bg));
+    --dbx-blue: var(--theme-primary, var(--bs-primary));
+    --dbx-hover: color-mix(in srgb, var(--dbx-fg) 10%, var(--dbx-bg));
     --tabs-height: 38px;
     --side-tab-width: 200px;
 
@@ -204,13 +205,13 @@
 
         &:hover {
             color: var(--dbx-fg);
-            background: #f1f1f1;
+            background: var(--dbx-hover);
         }
 
         &.active {
             color: var(--dbx-fg);
             background: var(--dbx-bg) !important;
-            box-shadow: inset 0 -2px #a3a3a3;
+            box-shadow: inset 0 -2px color-mix(in srgb, var(--dbx-fg) 42%, transparent);
         }
 
         .current-tab-indicator {
@@ -253,7 +254,7 @@
         font-size: 13px;
 
         &:hover {
-            background: #eeeeee;
+            background: var(--dbx-hover);
         }
     }
 
@@ -309,8 +310,8 @@
     }
 
     &.primary {
-        color: #34b98b;
-        border: 1px solid #d5f0e7;
+        color: var(--theme-success, #34b98b);
+        border: 1px solid color-mix(in srgb, var(--theme-success, #34b98b) 30%, transparent);
     }
 }
 
@@ -318,7 +319,7 @@
     position: relative;
     flex: 1 1 0;
     min-height: 0;
-    background: #151515;
+    background: var(--dbx-bg);
 
     > .content-tab {
         position: absolute;

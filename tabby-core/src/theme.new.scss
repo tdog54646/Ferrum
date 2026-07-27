@@ -10,7 +10,7 @@ app-root {
 
     .main.content {
         .tab-bar {
-            background: #f5f5f5 !important;
+            background: var(--dbx-muted, var(--theme-bg-more)) !important;
 
             .btn-tab-bar {
                 background: transparent;
@@ -21,8 +21,8 @@ app-root {
                     fill-opacity: 0.75;
                 }
 
-                &:hover { background: rgba(0, 0, 0, .125) !important; }
-                &:active { background: rgba(0, 0, 0, .25) !important; }
+                &:hover { background: var(--dbx-hover, var(--theme-bg-more-2)) !important; }
+                &:active { background: var(--dbx-selected, var(--theme-bg-less)) !important; }
             }
 
             &>.tabs {
@@ -60,8 +60,8 @@ app-root {
                     }
 
                     &.active {
-                        color: #0a0a0a;
-                        background: #ffffff !important;
+                        color: var(--dbx-fg, var(--theme-fg));
+                        background: var(--dbx-bg, var(--theme-bg)) !important;
                     }
                 }
             }
