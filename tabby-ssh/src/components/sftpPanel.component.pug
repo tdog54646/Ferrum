@@ -1,3 +1,12 @@
+.resize-handle(
+    title='Drag to resize · Double-click to reset',
+    (pointerdown)='startResize($event)',
+    (pointermove)='resize($event)',
+    (pointerup)='finishResize($event)',
+    (pointercancel)='finishResize($event)',
+    (dblclick)='resetPanelHeight($event)'
+)
+
 .header
     input.form-control.flex-grow-1.w-0(
         *ngIf='editingPath !== null',

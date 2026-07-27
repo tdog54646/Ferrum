@@ -1,6 +1,6 @@
 import * as C from 'constants'
 import { posix as path } from 'path'
-import { Component, Input, Output, EventEmitter, Inject, Optional } from '@angular/core'
+import { Component, Input, Output, EventEmitter, Inject, Optional, ElementRef, HostBinding, HostListener, OnDestroy } from '@angular/core'
 import { FileUpload, DirectoryUpload, DirectoryDownload, MenuItemOptions, NotificationsService, PlatformService } from 'tabby-core'
 import { SFTPSession, SFTPFile } from '../session/sftp'
 import { SSHSession } from '../session/ssh'
@@ -18,7 +18,14 @@ interface PathSegment {
     templateUrl: './sftpPanel.component.pug',
     styleUrls: ['./sftpPanel.component.scss'],
 })
-export class SFTPPanelComponent {
+export class SFTPPanelComponent implements OnDestroy {
+    private static readonly DEFAULT_HEIGHT_PERCENT = 80
+    private static readonly MIN_PANEL_HEIGHT = 180
+    private static readonly MIN_TERMINAL_HEIGHT = 120
+    private static readonly HEIGHT_STORAGE_KEY = 'ferrum.sftpPanelHeightPercent'
+
+    @HostBinding('style.height.%') panelHeightPercent = this.loadPanelHeight()
+    @HostBinding('class.resizing') resizing = false
     @Input() session: SSHSession
     @Output() closed = new EventEmitter<void>()
     sftp: SFTPSession
@@ -31,8 +38,14 @@ export class SFTPPanelComponent {
     editingPath: string|null = null
     showFilter = false
     filterText = ''
+    private resizeStartY = 0
+    private resizeStartHeight = 0
+    private previousBodyUserSelect = ''
+    private previousBodyCursor = ''
+    private resizeStylesApplied = false
 
     constructor (
+        private element: ElementRef<HTMLElement>,
         private ngbModal: NgbModal,
         private notifications: NotificationsService,
         public platform: PlatformService,
@@ -42,6 +55,7 @@ export class SFTPPanelComponent {
     }
 
     async ngOnInit (): Promise<void> {
+        this.normalizePanelHeight()
         this.sftp = await this.session.openSFTP()
         try {
             await this.navigate(this.path)
@@ -50,6 +64,71 @@ export class SFTPPanelComponent {
             this.notifications.error(error.message)
             await this.navigate('/')
         }
+    }
+
+    ngOnDestroy (): void {
+        this.restoreResizeStyles()
+    }
+
+    @HostListener('window:resize')
+    onWindowResize (): void {
+        this.normalizePanelHeight()
+    }
+
+    startResize (event: PointerEvent): void {
+        if (event.button !== 0) {
+            return
+        }
+
+        const handle = event.currentTarget as HTMLElement
+        handle.setPointerCapture(event.pointerId)
+        this.resizing = true
+        this.resizeStartY = event.clientY
+        this.resizeStartHeight = this.element.nativeElement.getBoundingClientRect().height
+        this.previousBodyUserSelect = document.body.style.userSelect
+        this.previousBodyCursor = document.body.style.cursor
+        document.body.style.userSelect = 'none'
+        document.body.style.cursor = 'ns-resize'
+        this.resizeStylesApplied = true
+        event.preventDefault()
+        event.stopPropagation()
+    }
+
+    resize (event: PointerEvent): void {
+        if (!this.resizing) {
+            return
+        }
+
+        const parentHeight = this.getParentHeight()
+        const requestedHeight = this.resizeStartHeight + this.resizeStartY - event.clientY
+        const height = this.clampPanelHeight(requestedHeight, parentHeight)
+        this.panelHeightPercent = height / parentHeight * 100
+        event.preventDefault()
+        event.stopPropagation()
+    }
+
+    finishResize (event: PointerEvent): void {
+        if (!this.resizing) {
+            return
+        }
+
+        const handle = event.currentTarget as HTMLElement
+        if (handle.hasPointerCapture(event.pointerId)) {
+            handle.releasePointerCapture(event.pointerId)
+        }
+        this.resizing = false
+        this.restoreResizeStyles()
+        this.savePanelHeight()
+        event.preventDefault()
+        event.stopPropagation()
+    }
+
+    resetPanelHeight (event: MouseEvent): void {
+        this.panelHeightPercent = SFTPPanelComponent.DEFAULT_HEIGHT_PERCENT
+        this.normalizePanelHeight()
+        this.savePanelHeight()
+        event.preventDefault()
+        event.stopPropagation()
     }
 
     async navigate (newPath: string, fallbackOnError = true): Promise<void> {
@@ -392,5 +471,46 @@ export class SFTPPanelComponent {
         this.filteredFileList = this.fileList.filter(item =>
             item.name.toLowerCase().includes(this.filterText.toLowerCase()),
         )
+    }
+
+    private getParentHeight (): number {
+        return this.element.nativeElement.parentElement?.clientHeight || window.innerHeight
+    }
+
+    private clampPanelHeight (height: number, parentHeight: number): number {
+        const maximum = Math.max(
+            SFTPPanelComponent.MIN_PANEL_HEIGHT,
+            parentHeight - SFTPPanelComponent.MIN_TERMINAL_HEIGHT,
+        )
+        return Math.min(maximum, Math.max(SFTPPanelComponent.MIN_PANEL_HEIGHT, height))
+    }
+
+    private normalizePanelHeight (): void {
+        const parentHeight = this.getParentHeight()
+        const requestedHeight = parentHeight * this.panelHeightPercent / 100
+        this.panelHeightPercent = this.clampPanelHeight(requestedHeight, parentHeight) / parentHeight * 100
+    }
+
+    private loadPanelHeight (): number {
+        const stored = Number.parseFloat(window.localStorage.getItem(SFTPPanelComponent.HEIGHT_STORAGE_KEY) ?? '')
+        return Number.isFinite(stored) && stored > 0 && stored <= 100
+            ? stored
+            : SFTPPanelComponent.DEFAULT_HEIGHT_PERCENT
+    }
+
+    private savePanelHeight (): void {
+        window.localStorage.setItem(
+            SFTPPanelComponent.HEIGHT_STORAGE_KEY,
+            this.panelHeightPercent.toFixed(3),
+        )
+    }
+
+    private restoreResizeStyles (): void {
+        if (!this.resizeStylesApplied) {
+            return
+        }
+        document.body.style.userSelect = this.previousBodyUserSelect
+        document.body.style.cursor = this.previousBodyCursor
+        this.resizeStylesApplied = false
     }
 }
