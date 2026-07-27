@@ -466,7 +466,7 @@ export class SFTPPanelComponent implements OnDestroy {
     }
 
     private getParentHeight (): number {
-        return this.element.nativeElement.parentElement?.clientHeight || window.innerHeight
+        return this.element.nativeElement.parentElement?.clientHeight ?? window.innerHeight
     }
 
     private clampPanelHeight (height: number, parentHeight: number): number {
