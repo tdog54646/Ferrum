@@ -236,7 +236,7 @@ jobs:
         # DEBUG: electron-builder,electron-builder:*
 
     - name: Build web resources (amd64 only)
-      run: zsh -c 'tar czf tabby-web.tar.gz (tabby-*|web)/dist'
+      run: zsh -c 'tar czf ferrum-web.tar.gz (tabby-*|web)/dist'
       if: matrix.build-arch == 'x64'
 
     - name: Upload symbols (amd64 only)
@@ -255,7 +255,7 @@ jobs:
       env:
         PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
       with:
-        repo: 'eugeny/tabby'
+        repo: 'tdog54646/Ferrum'
         dir: 'dist'
         rpmvers: 'el/9 el/8 ol/6 ol/7'
         debvers: 'ubuntu/bionic ubuntu/focal ubuntu/hirsute ubuntu/impish ubuntu/jammy ubuntu/kinetic ubuntu/noble ubuntu/oracular debian/jessie debian/stretch debian/buster debian/bullseye debian/bookworm debian/trixie debian/forky debian/duke debian/forky debian/sid'
@@ -294,7 +294,7 @@ jobs:
       name: Upload web tarball (amd64 only)
       with:
         name: Web tarball
-        path: tabby-web.tar.gz
+        path: ferrum-web.tar.gz
       if: matrix.build-arch == 'x64'
 
   Windows-Build:

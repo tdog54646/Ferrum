@@ -24,7 +24,7 @@ export default options => {
     const sourceMapOptions = {
         exclude: [/node_modules/, /vendor/],
         filename: '[file].map',
-        moduleFilenameTemplate: `webpack-tabby-${options.name}:///[resource-path]`,
+        moduleFilenameTemplate: `webpack-ferrum-${options.name}:///[resource-path]`,
     }
     let devtoolPlugin = wp.SourceMapDevToolPlugin
 
